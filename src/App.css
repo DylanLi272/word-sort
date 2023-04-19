@@ -1,3 +1,117 @@
-.App {
+.app {
+	height: 100vh;
+}
+
+.filter-section {
+	display: flex;
+	align-items: center;
+	margin: 3rem;
+}
+
+.word-choosing {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.log {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 30vw;
+	padding: 1rem;
+	margin: 1rem;
+}
+
+.history-log {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	border-style: solid;
+	border-radius: 0.5rem;
+	border-color: black;
+	border-width: 0.1rem;
+	padding: 1rem 0;
+	height: 12rem;
+	width: 20vw;
+}
+
+.log-item {
+	display: flex;
+	justify-content: flex-end;
+	border-radius: 0.2rem;
+	padding: 0.3rem 1rem;
+	margin: 0.2rem;
+}
+
+.log-word {
+	margin-right: 0.3rem;
+}
+
+.log-yes {
+	background-color: #afe6a8;
+}
+.log-nope {
+	background-color: #ff9a9a;
+}
+
+.word-area {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	padding: 1.5rem;
+}
+
+.word-selection {
+	display: flex;
+	align-items: center;
+}
+
+.word-box {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 40vw;
+	height: 10rem;
+	padding: 1rem;
+	margin: 1rem;
+
+	background-color: aliceblue;
+}
+.word {
+	font-size: 3rem;
 	text-align: center;
 }
+
+.controls {
+	display: flex;
+	flex-direction: column;
+}
+
+.button {
+	background-color: #AAAAAA;
+	border-radius: 1rem;
+	text-align: center;
+	padding: 1rem;
+	margin: 0.5rem;
+}
+
+.button:hover {
+	background-color: #CCCCCC;
+	cursor: pointer;
+}
+
+.yes {
+	background-color: #46b13a;
+}
+.yes:hover {
+	background-color: #4eeb3c;
+}
+
+.nope {
+	background-color: #fe2929;
+}
+.nope:hover {
+	background-color: #f74848;
+}
+
