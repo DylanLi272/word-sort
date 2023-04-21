@@ -7,7 +7,7 @@ function App() {
 	const [buffer, setBuffer] = useState([]); // input buffer to choose words from
 	const [history, setHistory] = useState([]); // history of decisions
 	const [knownWords, setKnownWords] = useState([]);
-	const [unknownWords, setUnknownWords] = useState([]);
+	const [filteredWords, setFilteredWords] = useState([]);
 
 	// const [uploadStatus, setUploadStatus] = useState(null);
 
@@ -76,11 +76,18 @@ function App() {
 	const handleDownload = (level) => {
 		var text = '';
 		var filename = level === 'yes' ? 'known-words.txt' : 'unknown-words.txt';
-		history.forEach((item) => {
-			if (item[1] === level) {
-				text += `${item[0]}\n`;
+		for (let i = history.length - 1; i >= 0; i--) {
+			if (history[i][1] === level) {
+				text += `${history[i][0]}\n`;
+				if (level === 'yes') {
+					knownWords.push(history[i][0]);
+				}
+				history.splice(i, 1);
 			}
-		});
+		}
+
+		handleLogUpdate();
+
 		const element = document.createElement('a');
 		element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
 		element.setAttribute('download', filename);
@@ -95,7 +102,7 @@ function App() {
 
 	const handleDownloadAllKnown = () => {
 		var text = '';
-		var filename = 'known-words-list.txt';
+		var filename = 'full-known-words-list.txt';
 		knownWords.forEach(item => text += `${item}\n`);
 
 		for (let i = history.length - 1; i >= 0; i--) {
@@ -154,20 +161,20 @@ function App() {
 				const contents = e.target.result;
 				const temp = contents.split(/[^A-Za-z]+/).toLowerCase();
 				temp.forEach((item) => {
-					if (!knownWords.includes(item) && !unknownWords.includes(item)) {
-						unknownWords.push(item);
+					if (!knownWords.includes(item) && !filteredWords.includes(item)) {
+						filteredWords.push(item);
 					}
 				});
 			};
 			reader.readAsText(files[i]);
 		}
 	}
-	const handleDownloadUnknown = () => {
+	const handleDownloadFiltered = () => {
 		var text = '';
-		unknownWords.forEach(item => text += `${item}\n`);
+		filteredWords.forEach(item => text += `${item}\n`);
 		const element = document.createElement('a');
 		element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-		element.setAttribute('download', 'unknown-words.txt');
+		element.setAttribute('download', 'filtered-words.txt');
 
 		element.style.display = 'none';
 		document.body.appendChild(element);
@@ -180,7 +187,7 @@ function App() {
 	useEffect(() => {
 		setBuffer([]);
 		setKnownWords([]);
-		setUnknownWords([]);
+		setFilteredWords([]);
 	}, []);
 
 
@@ -188,14 +195,14 @@ function App() {
 		<div className='app'>
 			<div className='filter-section'>
 				<div>
-					<div>Load Known Words</div>
+					<div>Load Known Words List</div>
 					<input type="file" onChange={handleKnownLoad} accept=".txt" multiple />
 				</div>
 				<div>
 					<div>Input Words</div>
 					<input type="file" onChange={handleFilterLoad} accept=".txt" multiple />
 				</div>
-				<div className='button filter' onClick={handleDownloadUnknown}>Get filter words</div>
+				<div className='button filter' onClick={handleDownloadFiltered}>Get filter words</div>
 				<div className='button all-known' onClick={handleDownloadAllKnown}>Get ALL known words</div>
 			</div>
 			<div className='word-choosing'>
@@ -208,7 +215,7 @@ function App() {
 				<div className='word-area'>
 					<div className='word-selection'>
 						<div className='word-box'>
-							<div className='word'>{curWord === undefined || curWord === null ? '*no words loaded*' : curWord}</div>
+							<div className='word'>{curWord === undefined || curWord === null ? '*no words available*' : curWord}</div>
 						</div>
 						<div className='controls'>
 							<div className='button yes' onClick={() => { handleWordButton('yes') }}>YES! I know it</div>
