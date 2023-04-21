@@ -36,7 +36,7 @@ function App() {
 	}
 
 	const handleWordButton = (level) => {
-		if (curWord == undefined || curWord == null) {
+		if (curWord === undefined || curWord === null) {
 			return
 		}
 		history.push([curWord, level]);
@@ -68,16 +68,16 @@ function App() {
 
 		setHistory([]);
 		handleLogUpdate();
-		
+
 		// inputRef.current.value = '';
 		// setUploadStatus('Upload success');
 	};
 
 	const handleDownload = (level) => {
 		var text = '';
-		var filename = level == 'yes' ? 'known-words.txt' : 'unknown-words.txt';
+		var filename = level === 'yes' ? 'known-words.txt' : 'unknown-words.txt';
 		history.forEach((item) => {
-			if (item[1] == level) {
+			if (item[1] === level) {
 				text += `${item[0]}\n`;
 			}
 		});
@@ -99,7 +99,7 @@ function App() {
 		knownWords.forEach(item => text += `${item}\n`);
 
 		for (let i = history.length - 1; i >= 0; i--) {
-			if (history[i][1] == 'yes') {
+			if (history[i][1] === 'yes') {
 				text += `${history[i][0]}\n`;
 				knownWords.push(history[i][0]);
 				history.splice(i, 1);
@@ -177,6 +177,13 @@ function App() {
 		document.body.removeChild(element);
 	}
 
+	useEffect(() => {
+		setBuffer([]);
+		setKnownWords([]);
+		setUnknownWords([]);
+	}, []);
+
+
 	return (
 		<div className='app'>
 			<div className='filter-section'>
@@ -186,7 +193,7 @@ function App() {
 				</div>
 				<div>
 					<div>Input Words</div>
-					<input type="file" onChange={handleFilterLoad} accept=".txt" multiple/>
+					<input type="file" onChange={handleFilterLoad} accept=".txt" multiple />
 				</div>
 				<div className='button filter' onClick={handleDownloadUnknown}>Get filter words</div>
 				<div className='button all-known' onClick={handleDownloadAllKnown}>Get ALL known words</div>
@@ -201,12 +208,12 @@ function App() {
 				<div className='word-area'>
 					<div className='word-selection'>
 						<div className='word-box'>
-							<div className='word'>{curWord == undefined || curWord == null ? '*no words loaded*' : curWord}</div>
+							<div className='word'>{curWord === undefined || curWord === null ? '*no words loaded*' : curWord}</div>
 						</div>
 						<div className='controls'>
-							<div className='button yes' onClick={() => { handleWordButton('yes') }}>YES!</div>
+							<div className='button yes' onClick={() => { handleWordButton('yes') }}>YES! I know it</div>
 							{/* <div className='button ehhh' onClick={() => { handleWordButton('ehhh') }}>Ehhh</div> */}
-							<div className='button nope' onClick={() => { handleWordButton('nope') }}>Nope</div>
+							<div className='button nope' onClick={() => { handleWordButton('nope') }}>Nope, I don't know</div>
 							<div className='button undo' onClick={handleUndo}>Undo</div>
 						</div>
 					</div>
