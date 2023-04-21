@@ -26,6 +26,9 @@ function App() {
 	}
 
 	const handleUndo = () => {
+		if (history.length < 1) {
+			return;
+		}
 		const temp = history.pop();
 		handleLogUpdate();
 		buffer.unshift(curWord);
@@ -42,23 +45,45 @@ function App() {
 	}
 
 	const handleFileLoad = (e) => {
-		const file = e.target.files[0];
+		const files = e.target.files;
+		if (files.length < 1) {
+			console.log('no files selected');
+			return;
+		}
+
+		const file = files[0];
+
+		for (let i = 0; i < files.length; i++) {
+			const reader = new FileReader();
+			reader.onload = (e) => {
+				const contents = e.target.result;
+				const temp = contents.split(/\s+/);
+				temp.forEach((item) => {
+					if (!knownWords.includes(item)) {
+						knownWords.push(item);
+					}
+				});
+			};
+			reader.readAsText(files[i]);
+		}
+
 		const reader = new FileReader();
 		reader.onload = (e) => {
 			const contents = e.target.result;
 			const temp = contents.split(/\s+/);
-			for (let i = temp.length - 1; i >= 0; i--) {
-				if (knownWords.includes(temp[i])) {
-					temp.splice(i, 1);
+			temp.forEach((item) => {
+				if (!buffer.includes(item)) {
+					buffer.push(item);
 				}
-			}
-			setCurWord(temp.shift());
-			setBuffer(temp);
+			});
+			setCurWord(buffer.shift());
 		};
 
 		reader.readAsText(file);
+
 		setHistory([]);
 		handleLogUpdate();
+		
 		// inputRef.current.value = '';
 		// setUploadStatus('Upload success');
 	};
@@ -83,40 +108,23 @@ function App() {
 		document.body.removeChild(element);
 	}
 
-	const handleKnownLoad = (e) => {
-		const file = e.target.files[0];
-		const reader = new FileReader();
-		reader.onload = (e) => {
-			const contents = e.target.result;
-			const temp = contents.split(/\s+/);
-			setKnownWords(temp);
-		};
-
-		reader.readAsText(file);
-	}
-
-	const handleFilterLoad = (e) => {
-		const file = e.target.files[0];
-		const reader = new FileReader();
-		reader.onload = (e) => {
-			const contents = e.target.result;
-			const temp = contents.split(/\s+/);
-			for (let i = temp.length - 1; i >= 0; i--) {
-				if (knownWords.includes(temp[i])) {
-					temp.splice(i, 1);
-				}
-			}
-			setUnknownWords(temp);
-		};
-
-		reader.readAsText(file);
-	}
-	const handleDownloadUnknown = () => {
+	const handleDownloadAllKnown = () => {
 		var text = '';
-		unknownWords.forEach(item => text += `${item}\n`);
+		var filename = 'known-words-list.txt';
+		knownWords.forEach(item => text += `${item}\n`);
+
+		for (let i = history.length - 1; i >= 0; i--) {
+			if (history[i][1] == 'yes') {
+				text += `${history[i][0]}\n`;
+				knownWords.push(history[i][0]);
+				history.splice(i, 1);
+			}
+		}
+		handleLogUpdate();
+
 		const element = document.createElement('a');
 		element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-		element.setAttribute('download', 'unknown-word.txt');
+		element.setAttribute('download', filename);
 
 		element.style.display = 'none';
 		document.body.appendChild(element);
@@ -126,22 +134,77 @@ function App() {
 		document.body.removeChild(element);
 	}
 
-	useEffect(() => {
+	const handleKnownLoad = (e) => {
+		const files = e.target.files;
+		if (files.length < 1) {
+			console.log('no files selected');
+			return;
+		}
 
-	}, []);
+		for (let i = 0; i < files.length; i++) {
+			const reader = new FileReader();
+			reader.onload = (e) => {
+				const contents = e.target.result;
+				const temp = contents.split(/\s+/);
+				temp.forEach((item) => {
+					if (!knownWords.includes(item)) {
+						knownWords.push(item);
+					}
+				});
+			};
+			reader.readAsText(files[i]);
+		}
+	}
+
+	const handleFilterLoad = (e) => {
+		const files = e.target.files;
+		if (files.length < 1) {
+			console.log('no files selected');
+			return;
+		}
+
+		for (let i = 0; i < files.length; i++) {
+			const reader = new FileReader();
+			reader.onload = (e) => {
+				const contents = e.target.result;
+				const temp = contents.split(/\s+/);
+				temp.forEach((item) => {
+					if (!knownWords.includes(item) && !unknownWords.includes(item)) {
+						unknownWords.push(item);
+					}
+				});
+			};
+			reader.readAsText(files[i]);
+		}
+	}
+	const handleDownloadUnknown = () => {
+		var text = '';
+		unknownWords.forEach(item => text += `${item}\n`);
+		const element = document.createElement('a');
+		element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+		element.setAttribute('download', 'unknown-words.txt');
+
+		element.style.display = 'none';
+		document.body.appendChild(element);
+
+		element.click();
+
+		document.body.removeChild(element);
+	}
 
 	return (
 		<div className='app'>
 			<div className='filter-section'>
 				<div>
 					<div>Load Known Words</div>
-					<input type="file" onChange={handleKnownLoad} accept=".txt" />
+					<input type="file" onChange={handleKnownLoad} accept=".txt" multiple />
 				</div>
 				<div>
 					<div>Input Words</div>
-					<input type="file" onChange={handleFilterLoad} accept=".txt" />
+					<input type="file" onChange={handleFilterLoad} accept=".txt" multiple/>
 				</div>
 				<div className='button filter' onClick={handleDownloadUnknown}>Get filter words</div>
+				<div className='button all-known' onClick={handleDownloadAllKnown}>Get ALL known words</div>
 			</div>
 			<div className='word-choosing'>
 				<div className='log'>
