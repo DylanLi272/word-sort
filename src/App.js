@@ -52,25 +52,10 @@ function App() {
 		}
 
 		const file = files[0];
-
-		for (let i = 0; i < files.length; i++) {
-			const reader = new FileReader();
-			reader.onload = (e) => {
-				const contents = e.target.result;
-				const temp = contents.split(/\s+/);
-				temp.forEach((item) => {
-					if (!knownWords.includes(item)) {
-						knownWords.push(item);
-					}
-				});
-			};
-			reader.readAsText(files[i]);
-		}
-
 		const reader = new FileReader();
 		reader.onload = (e) => {
 			const contents = e.target.result;
-			const temp = contents.split(/\s+/);
+			const temp = contents.split(/[^A-Za-z]+/).toLowerCase();
 			temp.forEach((item) => {
 				if (!buffer.includes(item)) {
 					buffer.push(item);
@@ -145,7 +130,7 @@ function App() {
 			const reader = new FileReader();
 			reader.onload = (e) => {
 				const contents = e.target.result;
-				const temp = contents.split(/\s+/);
+				const temp = contents.split(/[^A-Za-z]+/).toLowerCase();
 				temp.forEach((item) => {
 					if (!knownWords.includes(item)) {
 						knownWords.push(item);
@@ -167,7 +152,7 @@ function App() {
 			const reader = new FileReader();
 			reader.onload = (e) => {
 				const contents = e.target.result;
-				const temp = contents.split(/\s+/);
+				const temp = contents.split(/[^A-Za-z]+/).toLowerCase();
 				temp.forEach((item) => {
 					if (!knownWords.includes(item) && !unknownWords.includes(item)) {
 						unknownWords.push(item);
